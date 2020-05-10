@@ -23,7 +23,7 @@ function Rect(x, y, width, height) {
   this.height = height;
 }
 
-Rect.prototype.containsPoint = function(x, y) {
+Rect.prototype.containsPoint = function (x, y) {
   return (
     x >= this.x &&
     y >= this.y &&
@@ -329,7 +329,7 @@ export default class Slider extends PureComponent {
   }
 
   _handleStartShouldSetPanResponder = (
-    e: Object /* gestureState: Object */,
+    e: Object /* gestureState: Object */
   ): boolean =>
     // Should we become active when the user presses down on the thumb?
     this._thumbHitTest(e);
@@ -430,12 +430,11 @@ export default class Slider extends PureComponent {
           this.props.maximumValue,
           this.props.minimumValue +
             Math.round(
-              ratio *
-                (this.props.maximumValue - this.props.minimumValue) /
-                this.props.step,
+              (ratio * (this.props.maximumValue - this.props.minimumValue)) /
+                this.props.step
             ) *
-              this.props.step,
-        ),
+              this.props.step
+        )
       );
     }
     return Math.max(
@@ -443,8 +442,8 @@ export default class Slider extends PureComponent {
       Math.min(
         this.props.maximumValue,
         ratio * (this.props.maximumValue - this.props.minimumValue) +
-          this.props.minimumValue,
-      ),
+          this.props.minimumValue
+      )
     );
   };
 
@@ -462,13 +461,13 @@ export default class Slider extends PureComponent {
       this.props.animationConfig,
       {
         toValue: value,
-      },
+      }
     );
 
     Animated[animationType](this.state.value, animationConfig).start();
   };
 
-  _fireChangeEvent = event => {
+  _fireChangeEvent = (event) => {
     if (this.props[event]) {
       this.props[event](this._getCurrentValue());
     }
@@ -482,11 +481,11 @@ export default class Slider extends PureComponent {
     if (state.allMeasured === true) {
       size.width = Math.max(
         0,
-        props.thumbTouchSize.width - state.thumbSize.width,
+        props.thumbTouchSize.width - state.thumbSize.width
       );
       size.height = Math.max(
         0,
-        props.thumbTouchSize.height - state.containerSize.height,
+        props.thumbTouchSize.height - state.containerSize.height
       );
     }
 
@@ -520,7 +519,7 @@ export default class Slider extends PureComponent {
     const thumbTouchRect = this._getThumbTouchRect();
     return thumbTouchRect.containsPoint(
       nativeEvent.locationX,
-      nativeEvent.locationY,
+      nativeEvent.locationY
     );
   };
 
@@ -536,11 +535,11 @@ export default class Slider extends PureComponent {
       touchOverflowSize.height / 2 +
         (state.containerSize.height - props.thumbTouchSize.height) / 2,
       props.thumbTouchSize.width,
-      props.thumbTouchSize.height,
+      props.thumbTouchSize.height
     );
   };
 
-  _renderDebugThumbTouchRect = thumbLeft => {
+  _renderDebugThumbTouchRect = (thumbLeft) => {
     const thumbTouchRect = this._getThumbTouchRect();
     const positionStyle = {
       left: thumbLeft,
@@ -552,7 +551,7 @@ export default class Slider extends PureComponent {
     return (
       <Animated.View
         style={[defaultStyles.debugThumbTouchArea, positionStyle]}
-        pointerEvents="none"
+        pointerEvents='none'
       />
     );
   };
