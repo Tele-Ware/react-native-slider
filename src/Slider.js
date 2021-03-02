@@ -8,7 +8,7 @@ import {
   View,
   Easing,
   ViewPropTypes,
-  I18nManager,
+
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -59,6 +59,14 @@ export default class Slider extends PureComponent {
      * the value, the component won't be reset to its inital value.
      */
     value: PropTypes.number,
+
+
+    /**
+    * If true slider will be reversed.
+    * Default value is false.
+    */
+    isRTL: PropTypes.bool,
+
 
     /**
      * If true the user won't be able to move the slider.
@@ -180,6 +188,7 @@ export default class Slider extends PureComponent {
     thumbTouchSize: { width: 40, height: 40 },
     debugTouchArea: false,
     animationType: 'timing',
+    isRTL: false
   };
 
   state = {
@@ -188,9 +197,11 @@ export default class Slider extends PureComponent {
     thumbSize: { width: 0, height: 0 },
     allMeasured: false,
     value: new Animated.Value(this.props.value),
+    isRTL: false
   };
 
   componentWillMount() {
+    this.state.isRTL = this.props.isRTL
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
       onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
@@ -203,6 +214,7 @@ export default class Slider extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    this.state.isRTL = nextProps.isRTL
     const newValue = nextProps.value;
 
     if (this.props.value !== newValue) {
@@ -215,6 +227,7 @@ export default class Slider extends PureComponent {
   }
 
   render() {
+
     const {
       minimumValue,
       maximumValue,
@@ -239,18 +252,23 @@ export default class Slider extends PureComponent {
       trackSize,
       thumbSize,
       allMeasured,
+      isRTL
     } = this.state;
     const mainStyles = styles || defaultStyles;
     const thumbLeft = value.interpolate({
       inputRange: [minimumValue, maximumValue],
-      outputRange: I18nManager.isRTL
-        ? [0, -(containerSize.width - thumbSize.width)]
+      outputRange: isRTL
+        ? [(containerSize.width - thumbSize.width), 0]
         : [0, containerSize.width - thumbSize.width],
+      // ? [0, -(containerSize.width - thumbSize.width)]
+      // : [0, containerSize.width - thumbSize.width],
       // extrapolate: 'clamp',
     });
     const minimumTrackWidth = value.interpolate({
       inputRange: [minimumValue, maximumValue],
-      outputRange: [0, containerSize.width - thumbSize.width],
+      outputRange: isRTL ? [containerSize.width - thumbSize.width, 0] : [0, containerSize.width - thumbSize.width],
+      // inputRange: [minimumValue, maximumValue],
+      // outputRange: [0, containerSize.width - thumbSize.width],
       // extrapolate: 'clamp',
     });
     const valueVisibleStyle = {};
@@ -261,7 +279,7 @@ export default class Slider extends PureComponent {
     const minimumTrackStyle = {
       position: 'absolute',
       width: Animated.add(minimumTrackWidth, thumbSize.width / 2),
-      backgroundColor: minimumTrackTintColor,
+      backgroundColor: this.state.isRTL ? maximumTrackTintColor : minimumTrackTintColor,
       ...valueVisibleStyle,
     };
 
@@ -275,7 +293,7 @@ export default class Slider extends PureComponent {
       >
         <View
           style={[
-            { backgroundColor: maximumTrackTintColor },
+            { backgroundColor: this.state.isRTL ? minimumTrackTintColor : maximumTrackTintColor },
             mainStyles.track,
             trackStyle,
           ]}
@@ -410,7 +428,7 @@ export default class Slider extends PureComponent {
 
   _getThumbLeft = (value: number) => {
     const nonRtlRatio = this._getRatio(value);
-    const ratio = I18nManager.isRTL ? 1 - nonRtlRatio : nonRtlRatio;
+    const ratio = this.state.isRTL ? 1 - nonRtlRatio : nonRtlRatio;
     return (
       ratio * (this.state.containerSize.width - this.state.thumbSize.width)
     );
@@ -421,7 +439,7 @@ export default class Slider extends PureComponent {
     const thumbLeft = this._previousLeft + gestureState.dx;
 
     const nonRtlRatio = thumbLeft / length;
-    const ratio = I18nManager.isRTL ? 1 - nonRtlRatio : nonRtlRatio;
+    const ratio = this.state.isRTL ? 1 - nonRtlRatio : nonRtlRatio;
 
     if (this.props.step) {
       return Math.max(
@@ -429,11 +447,11 @@ export default class Slider extends PureComponent {
         Math.min(
           this.props.maximumValue,
           this.props.minimumValue +
-            Math.round(
-              (ratio * (this.props.maximumValue - this.props.minimumValue)) /
-                this.props.step
-            ) *
-              this.props.step
+          Math.round(
+            (ratio * (this.props.maximumValue - this.props.minimumValue)) /
+            this.props.step
+          ) *
+          this.props.step
         )
       );
     }
@@ -442,7 +460,7 @@ export default class Slider extends PureComponent {
       Math.min(
         this.props.maximumValue,
         ratio * (this.props.maximumValue - this.props.minimumValue) +
-          this.props.minimumValue
+        this.props.minimumValue
       )
     );
   };
@@ -530,10 +548,10 @@ export default class Slider extends PureComponent {
 
     return new Rect(
       touchOverflowSize.width / 2 +
-        this._getThumbLeft(this._getCurrentValue()) +
-        (state.thumbSize.width - props.thumbTouchSize.width) / 2,
+      this._getThumbLeft(this._getCurrentValue()) +
+      (state.thumbSize.width - props.thumbTouchSize.width) / 2,
       touchOverflowSize.height / 2 +
-        (state.containerSize.height - props.thumbTouchSize.height) / 2,
+      (state.containerSize.height - props.thumbTouchSize.height) / 2,
       props.thumbTouchSize.width,
       props.thumbTouchSize.height
     );
