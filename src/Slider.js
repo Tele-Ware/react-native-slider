@@ -11,9 +11,8 @@ import {
   PanResponder,
   View,
   Easing,
-  ViewPropTypes
 } from "react-native";
-
+import { ViewPropTypes, ImagePropTypes } from 'deprecated-react-native-prop-types';
 import PropTypes from 'prop-types';
 
 var TRACK_SIZE = 4;
@@ -26,22 +25,22 @@ function Rect(x, y, width, height) {
   this.height = height;
 }
 
-Rect.prototype.containsPoint = function(x, y) {
+Rect.prototype.containsPoint = function (x, y) {
   return (x >= this.x
-          && y >= this.y
-          && x <= this.x + this.width
-          && y <= this.y + this.height);
+    && y >= this.y
+    && x <= this.x + this.width
+    && y <= this.y + this.height);
 };
 
 var DEFAULT_ANIMATION_CONFIGS = {
-  spring : {
-    friction : 7,
-    tension  : 100
+  spring: {
+    friction: 7,
+    tension: 100
   },
-  timing : {
-    duration : 150,
-    easing   : Easing.inOut(Easing.ease),
-    delay    : 0
+  timing: {
+    duration: 150,
+    easing: Easing.inOut(Easing.ease),
+    delay: 0
   },
   // decay : { // This has a serious bug
   //   velocity     : 1,
@@ -108,7 +107,7 @@ export default class Slider extends PureComponent {
      * The default is {width: 40, height: 40}.
      */
     thumbTouchSize: PropTypes.shape(
-      {width: PropTypes.number, height: PropTypes.number}
+      { width: PropTypes.number, height: PropTypes.number }
     ),
 
     /**
@@ -146,7 +145,7 @@ export default class Slider extends PureComponent {
     /**
      * Sets an image for the thumb.
      */
-    thumbImage: Image.propTypes.source,
+    thumbImage: ImagePropTypes.source,
 
     /**
      * Set this to true to visually see the thumb touch rect in green.
@@ -156,22 +155,22 @@ export default class Slider extends PureComponent {
     /**
      * Set to true to animate values with default 'timing' animation type
      */
-    animateTransitions : PropTypes.bool,
+    animateTransitions: PropTypes.bool,
 
     /**
      * Custom Animation type. 'spring' or 'timing'.
      */
-    animationType : PropTypes.oneOf(['spring', 'timing']),
+    animationType: PropTypes.oneOf(['spring', 'timing']),
 
     /**
      * Used to configure the animation parameters.  These are the same parameters in the Animated library.
      */
-    animationConfig : PropTypes.object,
+    animationConfig: PropTypes.object,
 
     /**
      * Set to true to update the value whilst clicking the Slider
      */
-    trackClickable : PropTypes.bool,
+    trackClickable: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -182,16 +181,16 @@ export default class Slider extends PureComponent {
     minimumTrackTintColor: '#3f3f3f',
     maximumTrackTintColor: '#b3b3b3',
     thumbTintColor: '#343434',
-    thumbTouchSize: {width: 40, height: 40},
+    thumbTouchSize: { width: 40, height: 40 },
     debugTouchArea: false,
     animationType: 'timing',
     trackClickable: false,
   };
 
   state = {
-    containerSize: {width: 0, height: 0},
-    trackSize: {width: 0, height: 0},
-    thumbSize: {width: 0, height: 0},
+    containerSize: { width: 0, height: 0 },
+    trackSize: { width: 0, height: 0 },
+    thumbSize: { width: 0, height: 0 },
     allMeasured: false,
     value: new Animated.Value(this.props.value),
   };
@@ -237,7 +236,7 @@ export default class Slider extends PureComponent {
       trackClickable,
       ...other
     } = this.props;
-    var {value, containerSize, trackSize, thumbSize, allMeasured} = this.state;
+    var { value, containerSize, trackSize, thumbSize, allMeasured } = this.state;
     var mainStyles = styles || defaultStyles;
     var thumbLeft = value.interpolate({
       inputRange: [minimumValue, maximumValue],
@@ -261,7 +260,7 @@ export default class Slider extends PureComponent {
     return (
       <View {...other} style={[mainStyles.container, style]} onLayout={this._measureContainer}>
         <View
-          style={[{backgroundColor: maximumTrackTintColor,}, mainStyles.track, trackStyle]}
+          style={[{ backgroundColor: maximumTrackTintColor, }, mainStyles.track, trackStyle]}
           renderToHardwareTextureAndroid={true}
           onLayout={this._measureTrack} />
         <Animated.View
@@ -271,7 +270,7 @@ export default class Slider extends PureComponent {
           onLayout={this._measureThumb}
           renderToHardwareTextureAndroid={true}
           style={[
-            {backgroundColor: thumbTintColor},
+            { backgroundColor: thumbTintColor },
             mainStyles.thumb, thumbStyle,
             {
               transform: [
@@ -321,7 +320,7 @@ export default class Slider extends PureComponent {
   };
 
   _handlePanResponderGrant = (e: Object, gestureState: Object) => {
-    this._previousLeft = this.props.trackClickable ? e.nativeEvent.locationX - (this.props.thumbTouchSize.width/2) : this._getThumbLeft(this._getCurrentValue());
+    this._previousLeft = this.props.trackClickable ? e.nativeEvent.locationX - (this.props.thumbTouchSize.width / 2) : this._getThumbLeft(this._getCurrentValue());
     this._fireChangeEvent('onSlidingStart');
   };
 
@@ -361,8 +360,8 @@ export default class Slider extends PureComponent {
   };
 
   _handleMeasure = (name: string, x: Object) => {
-    var {width, height} = x.nativeEvent.layout;
-    var size = {width: width, height: height};
+    var { width, height } = x.nativeEvent.layout;
+    var size = { width: width, height: height };
 
     var storeName = `_${name}`;
     var currentSize = this[storeName];
@@ -420,12 +419,12 @@ export default class Slider extends PureComponent {
   };
 
   _setCurrentValueAnimated = (value: number) => {
-    var animationType   = this.props.animationType;
+    var animationType = this.props.animationType;
     var animationConfig = Object.assign(
       {},
       DEFAULT_ANIMATION_CONFIGS[animationType],
       this.props.animationConfig,
-      {toValue : value}
+      { toValue: value }
     );
 
     Animated[animationType](this.state.value, animationConfig).start();
@@ -451,7 +450,7 @@ export default class Slider extends PureComponent {
   };
 
   _getTouchOverflowStyle = () => {
-    var {width, height} = this._getTouchOverflowSize();
+    var { width, height } = this._getTouchOverflowSize();
 
     var touchOverflowStyle = {};
     if (width !== undefined && height !== undefined) {
@@ -509,7 +508,7 @@ export default class Slider extends PureComponent {
   };
 
   _renderThumbImage = () => {
-    var {thumbImage} = this.props;
+    var { thumbImage } = this.props;
 
     if (!thumbImage) return;
 
