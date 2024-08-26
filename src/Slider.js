@@ -207,7 +207,7 @@ export default class Slider extends PureComponent {
     });
   };
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     var newValue = nextProps.value;
 
     if (this.props.value !== newValue) {
